@@ -22,8 +22,7 @@ def ask_deepseek(prompt):
         "stream": False
     }
     response = requests.post(url, headers=headers, json=data)
-    result = response.json()
-    return result["choices"][0]["message"]["content"]
+    return response.json()
 
 data = {
     "product_name": ["MAC Chili", "Maybelline 130", "Romand Fudge"],
@@ -50,8 +49,13 @@ if uploaded:
         with st.spinner("AI dang phan tich..."):
             prompt = f"Mau RGB ({r},{g},{b}) la mau son. Hay tu van mau nay hop voi da nao, loai son phu hop."
             try:
-                advice = ask_deepseek(prompt)
-                st.subheader("Tu van AI:")
-                st.write(advice)
+                result = ask_deepseek(prompt)
+                st.subheader("Phan hoi tu API (debug):")
+                st.json(result)
+                if "choices" in result:
+                    st.subheader("Tu van AI:")
+                    st.write(result["choices"][0]["message"]["content"])
+                else:
+                    st.error(f"Loi: {result}")
             except Exception as e:
                 st.error(f"Loi: {e}")

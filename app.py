@@ -3,26 +3,26 @@ import pandas as pd
 import numpy as np
 from PIL import Image
 import requests
-import json
 
 st.set_page_config(page_title="Makeup Mentor AI", layout="wide")
 st.title("Makeup Mentor AI - Tu van my pham")
 
-DEEPSEEK_API_KEY = st.secrets["DEEPSEEK_API_KEY"]
+GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 
-def ask_deepseek(prompt):
-    url = "https://api.deepseek.com/v1/chat/completions"
+def ask_groq(prompt):
+    url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {
-        "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
+        "Authorization": f"Bearer {GROQ_API_KEY}",
         "Content-Type": "application/json"
     }
     data = {
-        "model": "deepseek-chat",
+        "model": "llama3-8b-8192",
         "messages": [{"role": "user", "content": prompt}],
-        "stream": False
+        "temperature": 0.7
     }
     response = requests.post(url, headers=headers, json=data)
-    return response.json()
+    result = response.json()
+    return result["choices"][0]["message"]["content"]
 
 data = {
     "product_name": ["MAC Chili", "Maybelline 130", "Romand Fudge"],
@@ -49,13 +49,8 @@ if uploaded:
         with st.spinner("AI dang phan tich..."):
             prompt = f"Mau RGB ({r},{g},{b}) la mau son. Hay tu van mau nay hop voi da nao, loai son phu hop."
             try:
-                result = ask_deepseek(prompt)
-                st.subheader("Phan hoi tu API (debug):")
-                st.json(result)
-                if "choices" in result:
-                    st.subheader("Tu van AI:")
-                    st.write(result["choices"][0]["message"]["content"])
-                else:
-                    st.error(f"Loi: {result}")
+                advice = ask_groq(prompt)
+                st.subheader("Tu van AI:")
+                st.write(advice)
             except Exception as e:
                 st.error(f"Loi: {e}")

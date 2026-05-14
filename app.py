@@ -11,9 +11,9 @@ try:
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
     model = genai.GenerativeModel("gemini-1.5-flash")
     gemini_ok = True
-except:
+except Exception as e:
     gemini_ok = False
-    st.warning("Chua cau hinh Gemini API. Them key vao Secrets.")
+    st.error(f"Loi cau hinh Gemini API: {e}")
 
 data = {
     "product_name": ["MAC Chili", "Maybelline 130", "Romand Fudge"],
@@ -39,8 +39,9 @@ if uploaded:
     if st.button("Tu van AI"):
         if gemini_ok:
             with st.spinner("AI dang phan tich..."):
-                prompt = f"Mau RGB ({r},{g},{b}) la mau son. Hay tu van."
+                prompt = f"Mau RGB ({r},{g},{b}) la mau son. Hay tu van mau nay hop voi da nao, loai son phu hop."
                 response = model.generate_content(prompt)
+                st.subheader("Tu van AI:")
                 st.write(response.text)
         else:
-            st.error("Chua cau hinh Gemini API")
+            st.error("Gemini API chua duoc cau hinh hoac key khong hop le.")

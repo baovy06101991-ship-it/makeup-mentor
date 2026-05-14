@@ -2,18 +2,28 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from PIL import Image
-import google.generativeai as genai
+import requests
+import json
 
 st.set_page_config(page_title="Makeup Mentor AI", layout="wide")
 st.title("Makeup Mentor AI - Tu van my pham")
 
-try:
-    genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-    model = genai.GenerativeModel("gemini-1.5-flash")
-    gemini_ok = True
-except Exception as e:
-    gemini_ok = False
-    st.error(f"Loi cau hinh Gemini API: {e}")
+DEEPSEEK_API_KEY = st.secrets["DEEPSEEK_API_KEY"]
+
+def ask_deepseek(prompt):
+    url = "https://api.deepseek.com/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "model": "deepseek-chat",
+        "messages": [{"role": "user", "content": prompt}],
+        "stream": False
+    }
+    response = requests.post(url, headers=headers, json=data)
+    result = response.json()
+    return result["choices"][0]["message"]["content"]
 
 data = {
     "product_name": ["MAC Chili", "Maybelline 130", "Romand Fudge"],
@@ -37,11 +47,11 @@ if uploaded:
     st.success(f"RGB: {r},{g},{b}")
 
     if st.button("Tu van AI"):
-        if gemini_ok:
-            with st.spinner("AI dang phan tich..."):
-                prompt = f"Mau RGB ({r},{g},{b}) la mau son. Hay tu van mau nay hop voi da nao, loai son phu hop."
-                response = model.generate_content(prompt)
+        with st.spinner("AI dang phan tich..."):
+            prompt = f"Mau RGB ({r},{g},{b}) la mau son. Hay tu van mau nay hop voi da nao, loai son phu hop."
+            try:
+                advice = ask_deepseek(prompt)
                 st.subheader("Tu van AI:")
-                st.write(response.text)
-        else:
-            st.error("Gemini API chua duoc cau hinh hoac key khong hop le.")
+                st.write(advice)
+            except Exception as e:
+                st.error(f"Loi: {e}")

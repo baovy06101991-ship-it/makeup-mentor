@@ -6,7 +6,7 @@ from groq import Groq
 import json
 
 st.set_page_config(page_title="Makeup Mentor AI", layout="wide")
-st.title("Makeup Mentor AI - Tu van my pham & cham soc da")
+st.title("💄 Makeup Mentor AI - Tu van my pham & cham soc da")
 
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 client = Groq(api_key=GROQ_API_KEY)
@@ -22,26 +22,26 @@ def ask_groq(prompt):
     except Exception as e:
         return f"Loi: {e}"
 
-# Du lieu san pham
+# Du lieu san pham (co link mua hang)
 products = {
     "Son": [
-        {"name": "MAC Chili", "brand": "MAC", "price": "750k", "image": "https://picsum.photos/id/1/150/150"},
-        {"name": "Maybelline 130", "brand": "Maybelline", "price": "280k", "image": "https://picsum.photos/id/2/150/150"},
-        {"name": "Romand Fudge", "brand": "Romand", "price": "320k", "image": "https://picsum.photos/id/3/150/150"},
-        {"name": "3CE Velvet", "brand": "3CE", "price": "450k", "image": "https://picsum.photos/id/4/150/150"}
+        {"name": "MAC Chili", "brand": "MAC", "price": "750,000d", "link": "https://shopee.vn/search?keyword=MAC%20Chili"},
+        {"name": "Maybelline 130", "brand": "Maybelline", "price": "280,000d", "link": "https://shopee.vn/search?keyword=Maybelline%20130"},
+        {"name": "Romand Fudge", "brand": "Romand", "price": "320,000d", "link": "https://shopee.vn/search?keyword=Romand%20Fudge"},
+        {"name": "3CE Velvet", "brand": "3CE", "price": "450,000d", "link": "https://shopee.vn/search?keyword=3CE%20Velvet"}
     ],
     "Kem nen": [
-        {"name": "Fit Me 120", "brand": "Maybelline", "price": "280k", "image": "https://picsum.photos/id/13/150/150"},
-        {"name": "Infallible 130", "brand": "L'Oreal", "price": "380k", "image": "https://picsum.photos/id/14/150/150"},
-        {"name": "Studio Fix NC30", "brand": "MAC", "price": "700k", "image": "https://picsum.photos/id/15/150/150"}
+        {"name": "Fit Me 120", "brand": "Maybelline", "price": "280,000d", "link": "https://shopee.vn/search?keyword=Maybelline%20Fit%20Me%20120"},
+        {"name": "Infallible 130", "brand": "L'Oreal", "price": "380,000d", "link": "https://shopee.vn/search?keyword=L'Oreal%20Infallible%20130"},
+        {"name": "Studio Fix NC30", "brand": "MAC", "price": "700,000d", "link": "https://shopee.vn/search?keyword=MAC%20Studio%20Fix%20NC30"}
     ],
     "Phan phu": [
-        {"name": "Laura Mercier", "brand": "Laura Mercier", "price": "950k", "image": "https://picsum.photos/id/19/150/150"},
-        {"name": "Innisfree No Sebum", "brand": "Innisfree", "price": "150k", "image": "https://picsum.photos/id/20/150/150"}
+        {"name": "Laura Mercier", "brand": "Laura Mercier", "price": "950,000d", "link": "https://shopee.vn/search?keyword=Laura%20Mercier%20Powder"},
+        {"name": "Innisfree No Sebum", "brand": "Innisfree", "price": "150,000d", "link": "https://shopee.vn/search?keyword=Innisfree%20No%20Sebum"}
     ],
     "Ma hong": [
-        {"name": "NARS Orgasm", "brand": "NARS", "price": "600k", "image": "https://picsum.photos/id/24/150/150"},
-        {"name": "MAC Peaches", "brand": "MAC", "price": "500k", "image": "https://picsum.photos/id/25/150/150"}
+        {"name": "NARS Orgasm", "brand": "NARS", "price": "600,000d", "link": "https://shopee.vn/search?keyword=NARS%20Orgasm"},
+        {"name": "MAC Peaches", "brand": "MAC", "price": "500,000d", "link": "https://shopee.vn/search?keyword=MAC%20Peaches"}
     ]
 }
 
@@ -52,17 +52,17 @@ def get_dominant_color(image):
     return avg[0], avg[1], avg[2]
 
 # ==================== GIAO DIEN ====================
-category = st.selectbox("Chon danh muc san pham", ["Son", "Kem nen", "Phan phu", "Ma hong"])
+category = st.selectbox("📂 Chon danh muc san pham", ["Son", "Kem nen", "Phan phu", "Ma hong"])
 
-st.subheader("Thong tin ca nhan (de tu van chinh xac hon)")
+st.subheader("🧑 Thong tin ca nhan (de tu van chinh xac hon)")
 col1, col2 = st.columns(2)
 with col1:
-    lip_type = st.selectbox("Tinh trang moi", ["Khong biet", "Moi thuong", "Moi kho", "Moi nut ne", "Moi sam mau"])
+    lip_type = st.selectbox("💋 Tinh trang moi", ["Khong biet", "Moi thuong", "Moi kho", "Moi nut ne", "Moi sam mau"])
 with col2:
-    skin_type = st.selectbox("Loai da", ["Khong biet", "Da thuong", "Da dau", "Da kho", "Da hon hop", "Da nhay cam"])
+    skin_type = st.selectbox("🧴 Loai da", ["Khong biet", "Da thuong", "Da dau", "Da kho", "Da hon hop", "Da nhay cam"])
 
 st.markdown("---")
-st.subheader("Tai anh mau son len de phan tich")
+st.subheader("📸 Tai anh mau son len de phan tich")
 
 uploaded = st.file_uploader("Chon anh (jpg, png)", type=["jpg", "png", "jpeg"])
 
@@ -70,9 +70,9 @@ if uploaded:
     img = Image.open(uploaded)
     st.image(img, caption="Anh cua ban", width=250)
     r, g, b = get_dominant_color(img)
-    st.success(f"Mau RGB: {r},{g},{b}")
+    st.success(f"🎨 Mau RGB: {r}, {g}, {b}")
 
-    if st.button("Tu van AI"):
+    if st.button("🔍 Tu van AI"):
         with st.spinner("AI dang phan tich..."):
             # 1. Tu van makeup
             prompt_makeup = f"""
@@ -111,12 +111,12 @@ if uploaded:
             st.subheader("🧴 Tu van Cham soc da:")
             st.write(advice_skincare)
             
-            # Hien thi san pham goi y
-            st.subheader(f"San pham {category} goi y (gia re):")
+            # Hien thi san pham goi y (co link mua)
+            st.subheader(f"🛒 San pham {category} goi y (gia re):")
             products_list = products.get(category, [])
             cols = st.columns(3)
             for i, p in enumerate(products_list[:3]):
                 with cols[i % 3]:
-                    st.image(p["image"], caption=p["name"], width=120)
-                    st.markdown(f"**{p['brand']}**")
-                    st.markdown(f"💰 {p['price']}")
+                    st.markdown(f"**{p['name']}**")
+                    st.markdown(f"🏷 {p['brand']} | 💰 {p['price']}")
+                    st.markdown(f"[🛍️ Mua ngay]({p['link']})", unsafe_allow_html=True)

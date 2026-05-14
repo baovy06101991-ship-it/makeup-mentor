@@ -6,6 +6,43 @@ from groq import Groq
 import json
 
 st.set_page_config(page_title="Makeup Mentor AI", layout="wide")
+
+# === CSS TRANG TRÍ ===
+st.markdown("""
+<style>
+    .stApp {
+        background: linear-gradient(135deg, #ffe6f0 0%, #ffd6e8 100%);
+    }
+    div[data-testid="column"] {
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 15px;
+        padding: 15px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        margin: 5px;
+    }
+    h1 {
+        color: #c2185b;
+        text-align: center;
+    }
+    .stButton button {
+        background-color: #c2185b;
+        color: white;
+        border-radius: 30px;
+        padding: 10px 24px;
+        font-weight: bold;
+    }
+    .stButton button:hover {
+        background-color: #e91e63;
+        transform: scale(1.02);
+    }
+    .stFileUploader {
+        border: 2px dashed #c2185b;
+        border-radius: 20px;
+        padding: 10px;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 st.title("💄 Makeup Mentor AI - Tu van my pham & cham soc da")
 
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
@@ -22,26 +59,21 @@ def ask_groq(prompt):
     except Exception as e:
         return f"Loi: {e}"
 
-# Du lieu san pham (co link mua hang)
 products = {
     "Son": [
         {"name": "MAC Chili", "brand": "MAC", "price": "750,000d", "link": "https://shopee.vn/search?keyword=MAC%20Chili"},
         {"name": "Maybelline 130", "brand": "Maybelline", "price": "280,000d", "link": "https://shopee.vn/search?keyword=Maybelline%20130"},
-        {"name": "Romand Fudge", "brand": "Romand", "price": "320,000d", "link": "https://shopee.vn/search?keyword=Romand%20Fudge"},
-        {"name": "3CE Velvet", "brand": "3CE", "price": "450,000d", "link": "https://shopee.vn/search?keyword=3CE%20Velvet"}
+        {"name": "Romand Fudge", "brand": "Romand", "price": "320,000d", "link": "https://shopee.vn/search?keyword=Romand%20Fudge"}
     ],
     "Kem nen": [
         {"name": "Fit Me 120", "brand": "Maybelline", "price": "280,000d", "link": "https://shopee.vn/search?keyword=Maybelline%20Fit%20Me%20120"},
-        {"name": "Infallible 130", "brand": "L'Oreal", "price": "380,000d", "link": "https://shopee.vn/search?keyword=L'Oreal%20Infallible%20130"},
-        {"name": "Studio Fix NC30", "brand": "MAC", "price": "700,000d", "link": "https://shopee.vn/search?keyword=MAC%20Studio%20Fix%20NC30"}
+        {"name": "Infallible 130", "brand": "L'Oreal", "price": "380,000d", "link": "https://shopee.vn/search?keyword=L'Oreal%20Infallible%20130"}
     ],
     "Phan phu": [
-        {"name": "Laura Mercier", "brand": "Laura Mercier", "price": "950,000d", "link": "https://shopee.vn/search?keyword=Laura%20Mercier%20Powder"},
         {"name": "Innisfree No Sebum", "brand": "Innisfree", "price": "150,000d", "link": "https://shopee.vn/search?keyword=Innisfree%20No%20Sebum"}
     ],
     "Ma hong": [
-        {"name": "NARS Orgasm", "brand": "NARS", "price": "600,000d", "link": "https://shopee.vn/search?keyword=NARS%20Orgasm"},
-        {"name": "MAC Peaches", "brand": "MAC", "price": "500,000d", "link": "https://shopee.vn/search?keyword=MAC%20Peaches"}
+        {"name": "NARS Orgasm", "brand": "NARS", "price": "600,000d", "link": "https://shopee.vn/search?keyword=NARS%20Orgasm"}
     ]
 }
 
@@ -51,10 +83,9 @@ def get_dominant_color(image):
     avg = arr.mean(axis=0).mean(axis=0).astype(int)
     return avg[0], avg[1], avg[2]
 
-# ==================== GIAO DIEN ====================
 category = st.selectbox("📂 Chon danh muc san pham", ["Son", "Kem nen", "Phan phu", "Ma hong"])
 
-st.subheader("🧑 Thong tin ca nhan (de tu van chinh xac hon)")
+st.subheader("🧑 Thong tin ca nhan")
 col1, col2 = st.columns(2)
 with col1:
     lip_type = st.selectbox("💋 Tinh trang moi", ["Khong biet", "Moi thuong", "Moi kho", "Moi nut ne", "Moi sam mau"])
@@ -74,13 +105,11 @@ if uploaded:
 
     if st.button("🔍 Tu van AI"):
         with st.spinner("AI dang phan tich..."):
-            # 1. Tu van makeup
             prompt_makeup = f"""
             Mau RGB ({r},{g},{b}) la mau son.
             Tinh trang moi: {lip_type}.
             Loai da: {skin_type}.
             Danh muc: {category}.
-            
             Hay tu van:
             1. Mau nay hop voi ai (mau da, phong cach)?
             2. Loai san pham {category} phu hop?
@@ -88,30 +117,25 @@ if uploaded:
             Chi tra loi bang tieng Viet, ngan gon.
             """
             advice_makeup = ask_groq(prompt_makeup)
-            
-            # 2. Tu van cham soc da
+
             prompt_skincare = f"""
             Dua tren thong tin:
             - Loai da: {skin_type}
             - Tinh trang moi: {lip_type}
-            - Mau son da chon: RGB ({r},{g},{b})
-            
+            - Mau son: RGB ({r},{g},{b})
             Hay tu van:
-            1. Cach chuan bi da truoc khi trang diem (duong am, kem lot).
-            2. San pham cham soc da phu hop voi loai da nay (sua rua mat, kem duong, kem chong nang).
-            3. Luu y khi chon son cho tinh trang moi nay.
-            Chi tra loi bang tieng Viet, ngan gon, thuc te.
+            1. Cach chuan bi da truoc khi trang diem.
+            2. San pham cham soc da phu hop.
+            3. Luu y khi chon son.
+            Chi tra loi bang tieng Viet, ngan gon.
             """
             advice_skincare = ask_groq(prompt_skincare)
-            
-            # Hien thi ket qua
+
             st.subheader("💄 Tu van Makeup:")
             st.write(advice_makeup)
-            
             st.subheader("🧴 Tu van Cham soc da:")
             st.write(advice_skincare)
-            
-            # Hien thi san pham goi y (co link mua)
+
             st.subheader(f"🛒 San pham {category} goi y (gia re):")
             products_list = products.get(category, [])
             cols = st.columns(3)

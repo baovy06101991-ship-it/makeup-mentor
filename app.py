@@ -21,8 +21,7 @@ def ask_groq(prompt):
         "temperature": 0.7
     }
     response = requests.post(url, headers=headers, json=data)
-    result = response.json()
-    return result["choices"][0]["message"]["content"]
+    return response.json()
 
 data = {
     "product_name": ["MAC Chili", "Maybelline 130", "Romand Fudge"],
@@ -49,8 +48,13 @@ if uploaded:
         with st.spinner("AI dang phan tich..."):
             prompt = f"Mau RGB ({r},{g},{b}) la mau son. Hay tu van mau nay hop voi da nao, loai son phu hop."
             try:
-                advice = ask_groq(prompt)
-                st.subheader("Tu van AI:")
-                st.write(advice)
+                result = ask_groq(prompt)
+                st.subheader("Response tu API (debug):")
+                st.json(result)
+                if "choices" in result and len(result["choices"]) > 0:
+                    st.subheader("Tu van AI:")
+                    st.write(result["choices"][0]["message"]["content"])
+                else:
+                    st.error(f"Loi: Khong tim thay 'choices' trong response")
             except Exception as e:
                 st.error(f"Loi: {e}")

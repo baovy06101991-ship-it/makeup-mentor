@@ -16,7 +16,7 @@ def ask_groq(prompt):
         "Content-Type": "application/json"
     }
     data = {
-        "model": "llama3-8b-8192",
+        "model": "llama-3.3-70b-versatile",
         "messages": [{"role": "user", "content": prompt}],
         "temperature": 0.7
     }
@@ -49,12 +49,10 @@ if uploaded:
             prompt = f"Mau RGB ({r},{g},{b}) la mau son. Hay tu van mau nay hop voi da nao, loai son phu hop."
             try:
                 result = ask_groq(prompt)
-                st.subheader("Response tu API (debug):")
-                st.json(result)
                 if "choices" in result and len(result["choices"]) > 0:
                     st.subheader("Tu van AI:")
                     st.write(result["choices"][0]["message"]["content"])
                 else:
-                    st.error(f"Loi: Khong tim thay 'choices' trong response")
+                    st.error(f"Loi API: {result}")
             except Exception as e:
                 st.error(f"Loi: {e}")

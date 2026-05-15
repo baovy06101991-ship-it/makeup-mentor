@@ -34,14 +34,14 @@ def ask_groq(prompt):
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
-            temperature=0.7
+            temperature=0.9,
+            max_tokens=1500
         )
         return response.choices[0].message.content
     except Exception as e:
         return f"Lỗi: {e}"
 
 def extract_json_from_text(text):
-    """Trích xuất JSON từ chuỗi văn bản (nếu AI trả về thêm text)"""
     json_match = re.search(r'```json\n(.*?)\n```', text, re.DOTALL)
     if json_match:
         return json.loads(json_match.group(1))
@@ -51,7 +51,6 @@ def extract_json_from_text(text):
         return None
 
 def get_product_link(product_name, brand):
-    """Tạo link tìm kiếm Shopee từ tên sản phẩm và thương hiệu"""
     query = f"{brand} {product_name}".replace(" ", "%20")
     return f"https://shopee.vn/search?keyword={query}"
 
@@ -61,7 +60,6 @@ def get_dominant_color(image):
     avg = arr.mean(axis=0).mean(axis=0).astype(int)
     return avg[0], avg[1], avg[2]
 
-# Giao diện
 category = st.selectbox("📂 Chọn danh mục sản phẩm", ["Son", "Kem nen", "Phan phu", "Ma hong"])
 
 col1, col2 = st.columns(2)
@@ -89,7 +87,7 @@ if uploaded:
     st.success(f"🎨 Màu RGB: {r}, {g}, {b}")
 
     if st.button("🔍 Tư vấn AI"):
-        with st.spinner("AI đang phân tích..."):
+        with st.spinner("AI đang phân tích chi tiết..."):
             prompt = f"""
 Màu RGB ({r},{g},{b}) là màu son chính.
 Tình trạng môi: {lip_type}.
@@ -98,17 +96,19 @@ Danh mục: {category}.
 Phân khúc giá: {price_prompt}.
 
 QUAN TRỌNG: 
-- Hãy trả lời bằng JSON thuần, không có text thừa, theo cấu trúc:
+- Hãy trả lời BẰNG TIẾNG VIỆT, DÀI, CHI TIẾT, ÍT NHẤT 200 TỪ.
+- Mô tả tông màu, cảm nhận, phong cách phù hợp.
+- Gợi ý 3 sản phẩm cụ thể (tên, thương hiệu, mã màu nếu có, giá, lý do).
+- Trả lời dưới dạng JSON thuần, không text thừa, theo cấu trúc:
 {{
   "color_tone": "tông màu (ví dụ: đỏ cam, hồng đất, nâu hồng...)",
-  "advice": "lời khuyên ngắn về sản phẩm và cách dùng",
+  "advice": "lời khuyên chi tiết, dài, bao gồm cảm nhận và phong cách",
   "products": [
     {{"name": "tên sản phẩm", "brand": "thương hiệu", "code": "mã màu (nếu có)", "price": "giá VND", "reason": "lý do phù hợp"}},
     {{...}},
     {{...}}
   ]
 }}
-- products phải có 3 sản phẩm.
 - price chỉ ghi số, không kèm chữ (ví dụ: 350000).
 - Nếu không biết mã màu, để "không rõ".
 """
@@ -116,7 +116,6 @@ QUAN TRỌNG:
             try:
                 data = extract_json_from_text(response_text)
                 if not data:
-                    # Fallback: AI không trả về JSON đúng định dạng
                     st.error("AI trả về định dạng không đúng, vui lòng thử lại.")
                     st.code(response_text)
                 else:

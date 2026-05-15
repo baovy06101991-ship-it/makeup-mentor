@@ -9,34 +9,11 @@ import re
 # ==================== CẤU HÌNH TRANG ====================
 st.set_page_config(page_title="Makeup Mentor AI", layout="wide")
 
-# ==================== CSS TIÊU ĐỀ ĐẸP ====================
+# ==================== CSS & HEADER ====================
 st.markdown("""
 <style>
-    .app-header {
-        text-align: center;
-        padding: 20px 0;
-        margin-bottom: 30px;
-        background: linear-gradient(135deg, #c2185b, #e91e63);
-        border-radius: 30px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    }
-    .app-title {
-        font-size: 2.5rem;
-        font-weight: bold;
-        color: white;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        letter-spacing: 1px;
-    }
-    .app-subtitle {
-        font-size: 1rem;
-        color: #ffe0f0;
-        margin-top: 5px;
-        font-style: italic;
-    }
-    .app-icon {
-        font-size: 3rem;
-        margin-bottom: 10px;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap');
+    
     .stApp {
         background: linear-gradient(135deg, #ffe6f0, #ffd6e8, #ffe0f0);
         background-size: 200% 200%;
@@ -46,6 +23,38 @@ st.markdown("""
         0% { background-position: 0% 50%; }
         50% { background-position: 100% 50%; }
         100% { background-position: 0% 50%; }
+    }
+    .app-header {
+        text-align: center;
+        padding: 25px 20px;
+        margin-bottom: 30px;
+        background: linear-gradient(135deg, #c2185b, #e91e63);
+        border-radius: 35px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    }
+    .logo-text {
+        font-size: 2.8rem;
+        font-weight: 500;
+        color: white;
+        font-family: 'Playfair Display', serif;
+        font-style: italic;
+        letter-spacing: 1px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 5px;
+    }
+    .logo-ai {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: #fff5f8;
+        font-family: 'Playfair Display', serif;
+        letter-spacing: 4px;
+    }
+    .logo-tagline {
+        font-size: 0.85rem;
+        color: #ffe0f0;
+        margin-top: 10px;
+        font-family: 'Playfair Display', serif;
+        letter-spacing: 1px;
     }
     div[data-testid="column"] {
         background-color: rgba(255, 255, 255, 0.85);
@@ -87,12 +96,15 @@ st.markdown("""
         border-color: #c2185b;
         background-color: #fff0f3;
     }
+    h1, h2, h3 {
+        font-family: 'Playfair Display', serif;
+    }
 </style>
 
 <div class="app-header">
-    <div class="app-icon">💄✨</div>
-    <div class="app-title">MAKEUP MENTOR AI</div>
-    <div class="app-subtitle">Trợ lý trang điểm & chăm sóc da thông minh</div>
+    <div class="logo-text">Makeup Mentor</div>
+    <div class="logo-ai">AI</div>
+    <div class="logo-tagline">Trợ lý trang điểm & chăm sóc da thông minh</div>
 </div>
 """, unsafe_allow_html=True)
 

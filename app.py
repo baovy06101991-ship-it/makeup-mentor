@@ -28,6 +28,18 @@ st.markdown("""
         50% { background-position: 100% 50%; }
         100% { background-position: 0% 50%; }
     }
+    
+    /* Hiệu ứng chữ RGB chuyển động */
+    @keyframes rgbFlow {
+        0% { color: #ff0000; text-shadow: 0 0 5px #ff0000; }
+        16% { color: #ffff00; text-shadow: 0 0 5px #ffff00; }
+        33% { color: #00ff00; text-shadow: 0 0 5px #00ff00; }
+        50% { color: #00ffff; text-shadow: 0 0 5px #00ffff; }
+        66% { color: #0000ff; text-shadow: 0 0 5px #0000ff; }
+        83% { color: #ff00ff; text-shadow: 0 0 5px #ff00ff; }
+        100% { color: #ff0000; text-shadow: 0 0 5px #ff0000; }
+    }
+    
     .app-header {
         text-align: center;
         padding: 25px 20px;
@@ -44,18 +56,21 @@ st.markdown("""
         letter-spacing: 1px;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         margin-bottom: 5px;
+        animation: rgbFlow 3s linear infinite;
     }
     .logo-ai {
         font-size: 1.4rem;
         font-weight: 600;
         color: #fff5f8;
         letter-spacing: 4px;
+        animation: rgbFlow 3s linear infinite;
     }
     .logo-tagline {
         font-size: 0.85rem;
         color: #ffe0f0;
         margin-top: 10px;
         letter-spacing: 1px;
+        animation: rgbFlow 3s linear infinite;
     }
     div[data-testid="column"] {
         background-color: rgba(255, 255, 255, 0.85);

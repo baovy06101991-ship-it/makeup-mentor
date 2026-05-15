@@ -7,7 +7,7 @@ import json
 
 st.set_page_config(page_title="Makeup Mentor AI", layout="wide")
 
-# CSS (giữ nguyên)
+# CSS
 st.markdown("""
 <style>
     .stApp { background: linear-gradient(135deg, #ffe6f0, #ffd6e8, #ffe0f0); background-size: 200% 200%; animation: gradientShift 8s ease infinite; }
@@ -38,24 +38,6 @@ def ask_groq(prompt):
         return response.choices[0].message.content
     except Exception as e:
         return f"Lỗi: {e}"
-
-products = {
-    "Son": [
-        {"name": "MAC Chili", "brand": "MAC", "price": "750,000d", "link": "https://shopee.vn/search?keyword=MAC%20Chili"},
-        {"name": "Maybelline 130", "brand": "Maybelline", "price": "280,000d", "link": "https://shopee.vn/search?keyword=Maybelline%20130"},
-        {"name": "Romand Fudge", "brand": "Romand", "price": "320,000d", "link": "https://shopee.vn/search?keyword=Romand%20Fudge"}
-    ],
-    "Kem nen": [
-        {"name": "Fit Me 120", "brand": "Maybelline", "price": "280,000d", "link": "https://shopee.vn/search?keyword=Maybelline%20Fit%20Me%20120"},
-        {"name": "Infallible 130", "brand": "L'Oreal", "price": "380,000d", "link": "https://shopee.vn/search?keyword=L'Oreal%20Infallible%20130"}
-    ],
-    "Phan phu": [
-        {"name": "Innisfree No Sebum", "brand": "Innisfree", "price": "150,000d", "link": "https://shopee.vn/search?keyword=Innisfree%20No%20Sebum"}
-    ],
-    "Ma hong": [
-        {"name": "NARS Orgasm", "brand": "NARS", "price": "600,000d", "link": "https://shopee.vn/search?keyword=NARS%20Orgasm"}
-    ]
-}
 
 def get_dominant_color(image):
     img = image.resize((50, 50))
@@ -104,7 +86,7 @@ Yêu cầu chi tiết: {detail_prompt}.
 
 QUAN TRỌNG:
 - Phải viết đúng tên thương hiệu, đúng mã màu (ví dụ: INTOYOU 302, Romand 23, 3CE 212, MAC Chili, Maybelline 130...).
-- Không viết tắt hoặc sai chính tả tên hãng (INTOYOU, không phải INTYOU).
+- Không viết tắt hoặc sai chính tả tên hãng.
 - Mỗi gợi ý phải có: tên sản phẩm + thương hiệu + mã màu (nếu có) + giá + lý do phù hợp.
 
 Hãy tư vấn:
@@ -116,12 +98,3 @@ Hãy tư vấn:
             advice = ask_groq(prompt)
             st.subheader("💄 Tư vấn AI:")
             st.write(advice)
-
-            st.subheader(f"🛒 Sản phẩm {category} tham khảo (theo phân khúc giá):")
-            products_list = products.get(category, [])
-            cols = st.columns(3)
-            for i, p in enumerate(products_list[:3]):
-                with cols[i % 3]:
-                    st.markdown(f"**{p['name']}**")
-                    st.markdown(f"🏷 {p['brand']} | 💰 {p['price']}")
-                    st.markdown(f"[🛍️ Mua ngay]({p['link']})", unsafe_allow_html=True)

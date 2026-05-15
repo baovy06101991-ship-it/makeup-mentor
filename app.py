@@ -35,7 +35,6 @@ st.markdown("""
         100% { background-position: 0% 0%; }
     }
     
-    /* Header */
     .app-header {
         text-align: center;
         padding: 25px 20px;
@@ -44,35 +43,53 @@ st.markdown("""
         border-radius: 35px;
         box-shadow: 0 15px 35px rgba(0,0,0,0.15);
     }
+    
+    /* Logo chạy màu */
     .logo-text {
         font-size: 2.8rem;
-        font-weight: 500;
+        font-weight: 600;
         font-style: italic;
         letter-spacing: 1px;
         margin-bottom: 5px;
-        color: white;
+        background: linear-gradient(90deg, #8B0000, #B22222, #CD5C5C, #A0522D, #800080, #4B0082, #2E8B57);
+        background-size: 200% 100%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: gradientMove 5s linear infinite;
     }
     .logo-ai {
         font-size: 1.4rem;
         font-weight: 600;
         letter-spacing: 4px;
-        color: #fff5f8;
+        background: linear-gradient(90deg, #8B0000, #B22222, #CD5C5C, #A0522D, #800080, #4B0082, #2E8B57);
+        background-size: 200% 100%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: gradientMove 5s linear infinite;
     }
     .logo-tagline {
         font-size: 0.85rem;
         margin-top: 10px;
         letter-spacing: 1px;
-        color: #ffe0f0;
-    }
-    
-    /* Áp dụng hiệu ứng cho toàn bộ chữ, trừ header và AI advice */
-    label, .stMarkdown, .stSelectbox, .stRadio, .stFileUploader, div[data-testid="column"] {
-        background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+        background: linear-gradient(90deg, #8B0000, #B22222, #CD5C5C, #A0522D, #800080, #4B0082, #2E8B57);
         background-size: 200% 100%;
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
-        animation: gradientMove 4s linear infinite;
+        animation: gradientMove 5s linear infinite;
+    }
+    
+    /* Áp dụng hiệu ứng cho các thành phần khác */
+    label, .stMarkdown, .stSelectbox, .stRadio, .stFileUploader, div[data-testid="column"] {
+        background: linear-gradient(90deg, #8B0000, #B22222, #CD5C5C, #A0522D, #800080, #4B0082, #2E8B57);
+        background-size: 200% 100%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: gradientMove 5s linear infinite;
+        font-weight: 500;
     }
     
     /* Loại trừ phần nội dung AI tư vấn */
@@ -84,7 +101,6 @@ st.markdown("""
         animation: none !important;
     }
     
-    /* Nút bấm */
     .stButton button {
         background: linear-gradient(90deg, #c2185b, #e91e63);
         color: white;

@@ -35,7 +35,7 @@ def ask_groq(prompt):
             model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.9,
-            max_tokens=2500
+            max_tokens=3000
         )
         return response.choices[0].message.content
     except Exception as e:
@@ -86,33 +86,55 @@ if uploaded:
     r, g, b = get_dominant_color(img)
     st.success(f"🎨 Màu RGB: {r}, {g}, {b}")
 
-    if st.button("🔍 Tư vấn AI"):
-        with st.spinner("AI đang phân tích chi tiết..."):
+    if st.button("🔍 Tư vấn chuyên gia"):
+        with st.spinner("Chuyên gia AI đang phân tích..."):
             prompt = f"""
-Màu RGB ({r},{g},{b}) là màu son chính.
-Tình trạng môi: {lip_type}.
-Loại da: {skin_type}.
-Danh mục: {category}.
-Phân khúc giá: {price_prompt}.
+BẠN LÀ CHUYÊN GIA TRANG ĐIỂM VỚI 10 NĂM KINH NGHIỆM.
+Hãy tư vấn một cách TẬN TÌNH, CHI TIẾT, DÀI (ít nhất 400 từ), dựa trên thông tin sau:
 
-YÊU CẦU QUAN TRỌNG:
-- TRẢ LỜI DÀI, CHI TIẾT, ÍT NHẤT 250 TỪ.
-- Mô tả CẢM NHẬN về màu sắc (ví dụ: ấm áp, dịu dàng, cá tính, sang trọng...).
-- Phân tích màu này hợp với phong cách nào (tự nhiên, công sở, dự tiệc, Hàn Quốc...).
-- Gợi ý 3 sản phẩm {category} cụ thể (tên, thương hiệu, mã màu nếu có, giá, lý do).
-- Nếu có thể, gợi ý thêm cách kết hợp với màu mắt, màu da.
+- Màu son RGB ({r},{g},{b})
+- Tình trạng môi: {lip_type}
+- Loại da: {skin_type}
+- Danh mục: {category}
+- Phân khúc giá: {price_prompt}
+
+YÊU CẦU TƯ VẤN CHUYÊN SÂU:
+
+1. PHÂN TÍCH MÀU SẮC:
+   - Màu này thuộc tông nào (đỏ cam, hồng đất, cam cháy, nâu hồng, nude...)?
+   - Cảm nhận: ấm áp hay lạnh, dịu dàng hay cá tính, sang trọng hay trẻ trung?
+   - Hợp với màu da nào (trắng, ngăm, trung bình, vàng...)?
+   - Phong cách phù hợp: tự nhiên, công sở, dự tiệc, Hàn Quốc, Âu Mỹ?
+
+2. TƯ VẤN SẢN PHẨM:
+   - Gợi ý 3 sản phẩm {category} cụ thể, có tên, thương hiệu, mã màu (nếu biết), giá, lý do chọn.
+   - Giải thích TẠI SAO sản phẩm này phù hợp với màu sắc, loại da, tình trạng môi.
+
+3. LỜI KHUYÊN CHI TIẾT:
+   - Cách dưỡng môi trước khi đánh son (với tình trạng môi {lip_type}).
+   - Cách chọn son cho da {skin_type}.
+   - Gợi ý cách kết hợp với màu mắt, màu má để có tổng thể hài hòa.
+   - Lưu ý đặc biệt cho người mới bắt đầu.
 
 Trả lời dưới dạng JSON thuần, không text thừa, theo cấu trúc:
 {{
-  "color_tone": "tông màu (ví dụ: đỏ cam, hồng đất, nâu hồng...)",
-  "feeling": "cảm nhận về màu sắc (ấm áp, dịu dàng, cá tính...)",
-  "style": "phong cách phù hợp (tự nhiên, công sở, dự tiệc...)",
-  "advice": "lời khuyên chi tiết DÀI, bao gồm cách chọn son, dưỡng môi, kết hợp makeup",
+  "color_analysis": {{
+    "tone": "tông màu",
+    "feeling": "cảm nhận về màu",
+    "skin_tone_suitable": "màu da phù hợp",
+    "style": "phong cách phù hợp"
+  }},
   "products": [
-    {{"name": "tên sản phẩm", "brand": "thương hiệu", "code": "mã màu (nếu có)", "price": 0, "reason": "lý do phù hợp"}},
+    {{"name": "tên sản phẩm", "brand": "thương hiệu", "code": "mã màu (nếu có)", "price": 0, "reason": "lý do chi tiết"}},
     {{...}},
     {{...}}
-  ]
+  ],
+  "advice": {{
+    "lip_care": "cách dưỡng môi cho {lip_type}",
+    "skin_care": "cách chọn son cho da {skin_type}",
+    "makeup_tips": "gợi ý kết hợp với mắt, má",
+    "note": "lưu ý đặc biệt"
+  }}
 }}
 - price chỉ ghi số, không kèm chữ.
 - Nếu không biết mã màu, để "không rõ".
@@ -121,16 +143,32 @@ Trả lời dưới dạng JSON thuần, không text thừa, theo cấu trúc:
             try:
                 data = extract_json_from_text(response_text)
                 if not data:
-                    st.error("AI trả về định dạng không đúng.")
+                    st.error("Chuyên gia AI trả về định dạng không đúng.")
                     st.code(response_text)
                 else:
-                    st.subheader("💄 Tư vấn AI:")
-                    st.write(f"**Tông màu:** {data.get('color_tone', 'không rõ')}")
-                    st.write(f"**Cảm nhận:** {data.get('feeling', 'không rõ')}")
-                    st.write(f"**Phong cách:** {data.get('style', 'không rõ')}")
-                    st.write(data.get('advice', ''))
+                    st.subheader("💄 Tư vấn chuyên gia:")
                     
-                    st.subheader("🛒 Sản phẩm gợi ý:")
+                    # Phân tích màu
+                    if "color_analysis" in data:
+                        ca = data["color_analysis"]
+                        st.markdown(f"**🎨 Tông màu:** {ca.get('tone', 'không rõ')}")
+                        st.markdown(f"**💭 Cảm nhận:** {ca.get('feeling', 'không rõ')}")
+                        st.markdown(f"**👩 Màu da phù hợp:** {ca.get('skin_tone_suitable', 'không rõ')}")
+                        st.markdown(f"**✨ Phong cách:** {ca.get('style', 'không rõ')}")
+                    
+                    # Lời khuyên chuyên sâu
+                    if "advice" in data:
+                        adv = data["advice"]
+                        st.markdown("---")
+                        st.markdown("### 📝 Lời khuyên chuyên sâu:")
+                        st.markdown(f"**💋 Dưỡng môi:** {adv.get('lip_care', 'không rõ')}")
+                        st.markdown(f"**🧴 Chọn son theo da:** {adv.get('skin_care', 'không rõ')}")
+                        st.markdown(f"**🎨 Kết hợp makeup:** {adv.get('makeup_tips', 'không rõ')}")
+                        st.markdown(f"**⚠️ Lưu ý:** {adv.get('note', 'không rõ')}")
+                    
+                    # Sản phẩm gợi ý
+                    st.markdown("---")
+                    st.subheader("🛒 Sản phẩm gợi ý (kèm link mua):")
                     cols = st.columns(3)
                     for i, product in enumerate(data.get('products', [])[:3]):
                         with cols[i % 3]:

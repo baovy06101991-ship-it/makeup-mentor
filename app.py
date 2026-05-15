@@ -69,7 +69,7 @@ def get_dominant_color(image):
     avg = arr.mean(axis=0).mean(axis=0).astype(int)
     return avg[0], avg[1], avg[2]
 
-# Danh mục (đã xóa lông mày và phấn mắt)
+# Danh mục sản phẩm
 category = st.selectbox("📂 Chọn danh mục sản phẩm", ["Son", "Kem nen", "Phan phu", "Ma hong", "Serum duong da"])
 
 col1, col2 = st.columns(2)
@@ -86,7 +86,21 @@ price_prompt = {
 }[price_range]
 
 st.markdown("---")
-st.subheader("📸 Tải ảnh màu tham khảo lên để phân tích")
+
+# Hướng dẫn chụp ảnh
+st.markdown("""
+### 📸 Hướng dẫn chụp ảnh để có kết quả chính xác nhất:
+| Bạn cần tư vấn về... | Hãy chụp cận... |
+|----------------------|------------------|
+| 🔴 **Màu son** | Vùng môi (tránh để mắt và da xung quanh) |
+| 🟠 **Màu mắt / phấn mắt** | Vùng mắt |
+| 🟡 **Màu má hồng** | Vùng má |
+| 🟢 **Lông mày** | Vùng lông mày |
+| 🔵 **Kem nền / phấn phủ** | Vùng má hoặc cằm (da sạch, không makeup) |
+| 🟣 **Serum / dưỡng da** | Vùng má (da sạch) |
+""")
+
+st.subheader("📸 Tải ảnh lên để phân tích")
 
 uploaded = st.file_uploader("Chọn ảnh (jpg, png)", type=["jpg", "png", "jpeg"])
 
@@ -165,7 +179,7 @@ Trả lời dưới dạng JSON:
                         st.markdown(f"**⚠️ Lưu ý:** {adv.get('note', 'không rõ')}")
                     
                     st.markdown("---")
-                    st.subheader(f"🛒 Sản phẩm {category} gợi ý:")
+                    st.subheader(f"🛒 Sản phẩm {category} gợi ý (kèm link mua):")
                     products_list = data.get('products', [])
                     if products_list:
                         cols = st.columns(3)

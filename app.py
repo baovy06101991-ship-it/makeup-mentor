@@ -6,26 +6,97 @@ from groq import Groq
 import json
 import re
 
+# ==================== CẤU HÌNH TRANG ====================
 st.set_page_config(page_title="Makeup Mentor AI", layout="wide")
 
-# CSS
+# ==================== CSS TIÊU ĐỀ ĐẸP ====================
 st.markdown("""
 <style>
-    .stApp { background: linear-gradient(135deg, #ffe6f0, #ffd6e8, #ffe0f0); background-size: 200% 200%; animation: gradientShift 8s ease infinite; }
-    @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-    div[data-testid="column"] { background-color: rgba(255, 255, 255, 0.85); backdrop-filter: blur(2px); border-radius: 20px; padding: 15px; margin: 8px; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-    div[data-testid="column"]:hover { transform: translateY(-5px); box-shadow: 0 12px 20px rgba(0,0,0,0.15); background-color: rgba(255, 255, 255, 0.95); }
-    h1 { color: #c2185b; text-shadow: 0 0 5px #ff80ab, 0 0 10px #ffb3c6; animation: titleGlow 3s ease-in-out infinite alternate; }
-    @keyframes titleGlow { from { text-shadow: 0 0 2px #ff80ab; } to { text-shadow: 0 0 12px #ff4081; } }
-    .stButton button { background: linear-gradient(90deg, #c2185b, #e91e63); color: white; border: none; border-radius: 40px; padding: 10px 28px; font-weight: bold; transition: 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-    .stButton button:hover { transform: scale(1.02); background: linear-gradient(90deg, #e91e63, #f06292); box-shadow: 0 6px 14px rgba(233,30,99,0.4); cursor: pointer; }
-    .stFileUploader { border: 2px dashed #e91e63; border-radius: 24px; padding: 12px; transition: 0.2s; }
-    .stFileUploader:hover { border-color: #c2185b; background-color: #fff0f3; }
+    .app-header {
+        text-align: center;
+        padding: 20px 0;
+        margin-bottom: 30px;
+        background: linear-gradient(135deg, #c2185b, #e91e63);
+        border-radius: 30px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    .app-title {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        letter-spacing: 1px;
+    }
+    .app-subtitle {
+        font-size: 1rem;
+        color: #ffe0f0;
+        margin-top: 5px;
+        font-style: italic;
+    }
+    .app-icon {
+        font-size: 3rem;
+        margin-bottom: 10px;
+    }
+    .stApp {
+        background: linear-gradient(135deg, #ffe6f0, #ffd6e8, #ffe0f0);
+        background-size: 200% 200%;
+        animation: gradientShift 8s ease infinite;
+    }
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    div[data-testid="column"] {
+        background-color: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(2px);
+        border-radius: 20px;
+        padding: 15px;
+        margin: 8px;
+        transition: 0.3s;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    div[data-testid="column"]:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+        background-color: rgba(255, 255, 255, 0.95);
+    }
+    .stButton button {
+        background: linear-gradient(90deg, #c2185b, #e91e63);
+        color: white;
+        border: none;
+        border-radius: 40px;
+        padding: 10px 28px;
+        font-weight: bold;
+        transition: 0.3s;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .stButton button:hover {
+        transform: scale(1.02);
+        background: linear-gradient(90deg, #e91e63, #f06292);
+        box-shadow: 0 6px 14px rgba(233,30,99,0.4);
+        cursor: pointer;
+    }
+    .stFileUploader {
+        border: 2px dashed #e91e63;
+        border-radius: 24px;
+        padding: 12px;
+        transition: 0.2s;
+    }
+    .stFileUploader:hover {
+        border-color: #c2185b;
+        background-color: #fff0f3;
+    }
 </style>
+
+<div class="app-header">
+    <div class="app-icon">💄✨</div>
+    <div class="app-title">MAKEUP MENTOR AI</div>
+    <div class="app-subtitle">Trợ lý trang điểm & chăm sóc da thông minh</div>
+</div>
 """, unsafe_allow_html=True)
 
-st.title("💄 Makeup Mentor AI - Tu van my pham & cham soc da")
-
+# ==================== KHỞI TẠO GROQ CLIENT ====================
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 client = Groq(api_key=GROQ_API_KEY)
 
@@ -69,7 +140,7 @@ def get_dominant_color(image):
     avg = arr.mean(axis=0).mean(axis=0).astype(int)
     return avg[0], avg[1], avg[2]
 
-# Danh mục sản phẩm
+# ==================== GIAO DIỆN CHÍNH ====================
 category = st.selectbox("📂 Chọn danh mục sản phẩm", ["Son", "Kem nen", "Phan phu", "Ma hong", "Serum duong da"])
 
 col1, col2 = st.columns(2)

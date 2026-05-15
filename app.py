@@ -12,7 +12,11 @@ st.set_page_config(page_title="Makeup Mentor AI", layout="wide")
 # ==================== CSS & HEADER ====================
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap');
+    
+    * {
+        font-family: 'Playfair Display', 'Times New Roman', 'Segoe UI', Arial, sans-serif;
+    }
     
     .stApp {
         background: linear-gradient(135deg, #ffe6f0, #ffd6e8, #ffe0f0);
@@ -36,7 +40,6 @@ st.markdown("""
         font-size: 2.8rem;
         font-weight: 500;
         color: white;
-        font-family: 'Playfair Display', serif;
         font-style: italic;
         letter-spacing: 1px;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
@@ -46,14 +49,12 @@ st.markdown("""
         font-size: 1.4rem;
         font-weight: 600;
         color: #fff5f8;
-        font-family: 'Playfair Display', serif;
         letter-spacing: 4px;
     }
     .logo-tagline {
         font-size: 0.85rem;
         color: #ffe0f0;
         margin-top: 10px;
-        font-family: 'Playfair Display', serif;
         letter-spacing: 1px;
     }
     div[data-testid="column"] {
@@ -76,9 +77,10 @@ st.markdown("""
         border: none;
         border-radius: 40px;
         padding: 10px 28px;
-        font-weight: bold;
+        font-weight: 600;
         transition: 0.3s;
         box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        font-size: 1rem;
     }
     .stButton button:hover {
         transform: scale(1.02);
@@ -96,8 +98,12 @@ st.markdown("""
         border-color: #c2185b;
         background-color: #fff0f3;
     }
-    h1, h2, h3 {
-        font-family: 'Playfair Display', serif;
+    h1, h2, h3, .stMarkdown, p, div, span, label {
+        font-family: 'Playfair Display', 'Times New Roman', 'Segoe UI', Arial, sans-serif;
+    }
+    .stSelectbox label, .stRadio label, .stColumns label {
+        font-weight: 500;
+        font-size: 1rem;
     }
 </style>
 

@@ -191,10 +191,24 @@ st.markdown("""
 
 st.subheader("📸 Tải ảnh lên để phân tích")
 
-uploaded = st.file_uploader("Chọn ảnh (jpg, png)", type=["jpg", "png", "jpeg"])
+# === CÁCH 1: CHỤP ẢNH TRỰC TIẾP (khuyến nghị cho mobile) ===
+st.markdown("**Cách 1: Chụp ảnh trực tiếp (nhanh, ổn định trên điện thoại)**")
+camera_image = st.camera_input("📷 Mở camera", key="camera_input")
 
-if uploaded:
-    img = Image.open(uploaded)
+# === CÁCH 2: UPLOAD ẢNH TỪ THƯ VIỆN ===
+st.markdown("**Cách 2: Chọn ảnh từ thư viện**")
+uploaded_file = st.file_uploader("📁 Tải ảnh lên", type=["jpg", "png", "jpeg"], key="file_uploader")
+
+# Xử lý ảnh từ nguồn nào có
+img = None
+if camera_image is not None:
+    img = Image.open(camera_image)
+    st.success("✅ Đã chụp ảnh thành công!")
+elif uploaded_file is not None:
+    img = Image.open(uploaded_file)
+    st.success("✅ Đã tải ảnh lên thành công!")
+
+if img:
     st.image(img, caption="Ảnh của bạn", width=250)
     r, g, b = get_dominant_color(img)
     st.success(f"🎨 Màu RGB: {r}, {g}, {b}")

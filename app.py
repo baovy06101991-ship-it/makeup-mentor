@@ -29,7 +29,7 @@ st.markdown("""
         100% { background-position: 0% 50%; }
     }
     
-    /* Gradient chạy ngang */
+    /* Gradient chạy ngang cho các thành phần khác */
     @keyframes gradientMove {
         0% { background-position: 100% 0%; }
         100% { background-position: 0% 0%; }
@@ -44,41 +44,26 @@ st.markdown("""
         box-shadow: 0 15px 35px rgba(0,0,0,0.15);
     }
     
-    /* Logo chạy màu */
+    /* Logo không chạy màu, giữ màu trắng cố định */
     .logo-text {
         font-size: 2.8rem;
         font-weight: 600;
         font-style: italic;
         letter-spacing: 1px;
         margin-bottom: 5px;
-        background: linear-gradient(90deg, #8B0000, #B22222, #CD5C5C, #A0522D, #800080, #4B0082, #2E8B57);
-        background-size: 200% 100%;
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        animation: gradientMove 5s linear infinite;
+        color: white;
     }
     .logo-ai {
         font-size: 1.4rem;
         font-weight: 600;
         letter-spacing: 4px;
-        background: linear-gradient(90deg, #8B0000, #B22222, #CD5C5C, #A0522D, #800080, #4B0082, #2E8B57);
-        background-size: 200% 100%;
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        animation: gradientMove 5s linear infinite;
+        color: #fff5f8;
     }
     .logo-tagline {
         font-size: 0.85rem;
         margin-top: 10px;
         letter-spacing: 1px;
-        background: linear-gradient(90deg, #8B0000, #B22222, #CD5C5C, #A0522D, #800080, #4B0082, #2E8B57);
-        background-size: 200% 100%;
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-        animation: gradientMove 5s linear infinite;
+        color: #ffe0f0;
     }
     
     /* Áp dụng hiệu ứng cho các thành phần khác */
@@ -223,7 +208,7 @@ st.markdown("---")
 # Hướng dẫn chụp ảnh
 st.markdown("""
 ### 📸 Hướng dẫn chụp ảnh để có kết quả chính xác nhất:
-| Bạn cần tư vấn về... | Hãy chụp cận... |
+| Bạn cần tư vấn sobre... | Hãy chụp cận... |
 |----------------------|------------------|
 | 🔴 **Màu son** | Vùng môi (tránh để mắt và da xung quanh) |
 | 🟠 **Màu mắt / phấn mắt** | Vùng mắt |

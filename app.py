@@ -10,10 +10,29 @@ import os
 # ==================== CẤU HÌNH TRANG ====================
 st.set_page_config(page_title="Makeup Mentor AI", layout="wide")
 
-# ==================== KHỞI TẠO SESSION STATE CHO LƯỢT TRUY CẬP ====================
+# ==================== ĐẾM LƯỢT TRUY CẬP LÂU DÀI (FILE JSON) ====================
+COUNTER_FILE = "counter.json"
+
+def load_counter():
+    """Đọc số lượt truy cập từ file JSON"""
+    if os.path.exists(COUNTER_FILE):
+        try:
+            with open(COUNTER_FILE, "r") as f:
+                return json.load(f).get("count", 0)
+        except:
+            return 0
+    return 0
+
+def save_counter(count):
+    """Lưu số lượt truy cập vào file JSON"""
+    with open(COUNTER_FILE, "w") as f:
+        json.dump({"count": count}, f)
+
+# Khởi tạo hoặc tăng lượt truy cập
 if "visit_count" not in st.session_state:
-    st.session_state.visit_count = 0
-st.session_state.visit_count += 1
+    st.session_state.visit_count = load_counter()
+    st.session_state.visit_count += 1
+    save_counter(st.session_state.visit_count)
 
 # ==================== CSS & HEADER ====================
 st.markdown("""
@@ -151,7 +170,7 @@ st.markdown("""
 
 # ==================== SIDEBAR - THÔNG TIN & THỐNG KÊ ====================
 st.sidebar.markdown("### 📊 Thống kê")
-st.sidebar.metric("Lượt truy cập", st.session_state.visit_count)
+st.sidebar.metric("Tổng lượt truy cập", st.session_state.visit_count)
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 👨‍💻 Tác giả")
 st.sidebar.markdown("**Nguyễn Thế Anh**")

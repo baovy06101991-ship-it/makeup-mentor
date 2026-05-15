@@ -7,7 +7,7 @@ import json
 
 st.set_page_config(page_title="Makeup Mentor AI", layout="wide")
 
-# === CSS (giữ nguyên phần cũ, có thể thêm tùy chỉnh) ===
+# CSS (giữ nguyên)
 st.markdown("""
 <style>
     .stApp { background: linear-gradient(135deg, #ffe6f0, #ffd6e8, #ffe0f0); background-size: 200% 200%; animation: gradientShift 8s ease infinite; }
@@ -39,7 +39,6 @@ def ask_groq(prompt):
     except Exception as e:
         return f"Lỗi: {e}"
 
-# Dữ liệu sản phẩm mẫu (có thể bỏ qua, AI sẽ tự tìm)
 products = {
     "Son": [
         {"name": "MAC Chili", "brand": "MAC", "price": "750,000d", "link": "https://shopee.vn/search?keyword=MAC%20Chili"},
@@ -64,7 +63,6 @@ def get_dominant_color(image):
     avg = arr.mean(axis=0).mean(axis=0).astype(int)
     return avg[0], avg[1], avg[2]
 
-# === GIAO DIỆN CHÍNH ===
 category = st.selectbox("📂 Chọn danh mục sản phẩm", ["Son", "Kem nen", "Phan phu", "Ma hong"])
 
 col1, col2 = st.columns(2)
@@ -73,13 +71,15 @@ with col1:
 with col2:
     skin_type = st.selectbox("🧴 Loại da", ["Không biết", "Da thường", "Da dầu", "Da khô", "Da hỗn hợp", "Da nhạy cảm"])
 
-# === PHÂN KHÚC GIÁ ===
-price_range = st.radio("💰 Phân khúc giá", ["Giá rẻ (dưới 500k)", "Cao cấp (500k - 2tr)"])
-price_prompt = "ưu tiên sản phẩm giá dưới 500,000đ" if "rẻ" in price_range else "ưu tiên sản phẩm giá từ 500,000đ đến 2,000,000đ"
+price_range = st.radio("💰 Phân khúc giá", ["Giá rẻ (dưới 500k)", "Tầm trung (500k - 1tr)", "Cao cấp (1tr - 2tr)"])
+price_prompt = {
+    "Giá rẻ (dưới 500k)": "ưu tiên sản phẩm dưới 500,000đ",
+    "Tầm trung (500k - 1tr)": "ưu tiên sản phẩm từ 500,000đ đến 1,000,000đ",
+    "Cao cấp (1tr - 2tr)": "ưu tiên sản phẩm từ 1,000,000đ đến 2,000,000đ"
+}[price_range]
 
-# === ĐỘ CHI TIẾT ===
-detail_level = st.radio("📝 Độ chi tiết tư vấn", ["Nhanh (gợi ý chính)", "Chuyên sâu (có mã sản phẩm, màu cụ thể)"])
-detail_prompt = "trả lời ngắn gọn, chỉ gợi ý 2-3 sản phẩm phù hợp" if "Nhanh" in detail_level else "trả lời chi tiết, có mã sản phẩm cụ thể (nếu biết), mô tả màu sắc và lý do phù hợp"
+detail_level = st.radio("📝 Độ chi tiết", ["Nhanh (gợi ý chính)", "Chuyên sâu (có mã số, màu cụ thể)"])
+detail_prompt = "trả lời ngắn gọn" if "Nhanh" in detail_level else "trả lời chi tiết, có mã sản phẩm cụ thể (nếu biết), mô tả màu chính xác"
 
 st.markdown("---")
 st.subheader("📸 Tải ảnh màu son lên để phân tích")
@@ -99,20 +99,25 @@ Màu RGB ({r},{g},{b}) là màu son chính.
 Tình trạng môi: {lip_type}.
 Loại da: {skin_type}.
 Danh mục: {category}.
-{price_prompt}.
-{detail_prompt}.
+Phân khúc giá: {price_prompt}.
+Yêu cầu chi tiết: {detail_prompt}.
 
-Yêu cầu:
-- Nếu có thể, hãy gợi ý sản phẩm có mã số cụ thể (ví dụ: INTYou 302, Romand 23, 3CE 212...).
-- Mỗi gợi ý kèm màu sắc, phân khúc giá, và lý do phù hợp.
-- Trả lời bằng tiếng Việt, dễ hiểu.
+QUAN TRỌNG:
+- Phải viết đúng tên thương hiệu, đúng mã màu (ví dụ: INTOYOU 302, Romand 23, 3CE 212, MAC Chili, Maybelline 130...).
+- Không viết tắt hoặc sai chính tả tên hãng (INTOYOU, không phải INTYOU).
+- Mỗi gợi ý phải có: tên sản phẩm + thương hiệu + mã màu (nếu có) + giá + lý do phù hợp.
+
+Hãy tư vấn:
+1. Màu này gần với tông màu gì (đỏ cam, hồng đất, cam cháy, nâu hồng...)?
+2. Gợi ý 3 sản phẩm {category} cụ thể, **có mã màu hoặc tên màu chính xác**.
+3. Đánh giá độ phù hợp với loại da {skin_type} và tình trạng môi {lip_type}.
+4. Trả lời bằng tiếng Việt, dễ hiểu, chi tiết.
 """
             advice = ask_groq(prompt)
             st.subheader("💄 Tư vấn AI:")
             st.write(advice)
 
-            # Hiển thị sản phẩm gợi ý (dự phòng)
-            st.subheader(f"🛒 Sản phẩm {category} tham khảo:")
+            st.subheader(f"🛒 Sản phẩm {category} tham khảo (theo phân khúc giá):")
             products_list = products.get(category, [])
             cols = st.columns(3)
             for i, p in enumerate(products_list[:3]):

@@ -29,63 +29,31 @@ st.markdown("""
         100% { background-position: 0% 50%; }
     }
     
-    /* Hiệu ứng chữ RGB chuyển động */
-    @keyframes rgbFlow {
-        0% { color: #ff0000; text-shadow: 0 0 5px #ff0000; }
-        16% { color: #ffff00; text-shadow: 0 0 5px #ffff00; }
-        33% { color: #00ff00; text-shadow: 0 0 5px #00ff00; }
-        50% { color: #00ffff; text-shadow: 0 0 5px #00ffff; }
-        66% { color: #0000ff; text-shadow: 0 0 5px #0000ff; }
-        83% { color: #ff00ff; text-shadow: 0 0 5px #ff00ff; }
-        100% { color: #ff0000; text-shadow: 0 0 5px #ff0000; }
+    /* Gradient chạy ngang */
+    @keyframes gradientMove {
+        0% { background-position: 100% 0%; }
+        100% { background-position: 0% 0%; }
     }
     
-    .app-header {
-        text-align: center;
-        padding: 25px 20px;
-        margin-bottom: 30px;
-        background: linear-gradient(135deg, #c2185b, #e91e63);
-        border-radius: 35px;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    /* Áp dụng hiệu ứng cho tất cả chữ */
+    label, .stMarkdown, .stSelectbox, .stRadio, .stFileUploader, div[data-testid="column"] {
+        background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+        background-size: 200% 100%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: gradientMove 4s linear infinite;
     }
-    .logo-text {
-        font-size: 2.8rem;
-        font-weight: 500;
-        color: white;
-        font-style: italic;
-        letter-spacing: 1px;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        margin-bottom: 5px;
-        animation: rgbFlow 3s linear infinite;
+    
+    /* Loại trừ phần nội dung AI tư vấn */
+    .ai-advice, .ai-advice * {
+        background: none !important;
+        -webkit-background-clip: unset !important;
+        background-clip: unset !important;
+        color: #2c3e50 !important;
+        animation: none !important;
     }
-    .logo-ai {
-        font-size: 1.4rem;
-        font-weight: 600;
-        color: #fff5f8;
-        letter-spacing: 4px;
-        animation: rgbFlow 3s linear infinite;
-    }
-    .logo-tagline {
-        font-size: 0.85rem;
-        color: #ffe0f0;
-        margin-top: 10px;
-        letter-spacing: 1px;
-        animation: rgbFlow 3s linear infinite;
-    }
-    div[data-testid="column"] {
-        background-color: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(2px);
-        border-radius: 20px;
-        padding: 15px;
-        margin: 8px;
-        transition: 0.3s;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
-    div[data-testid="column"]:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 20px rgba(0,0,0,0.15);
-        background-color: rgba(255, 255, 255, 0.95);
-    }
+    
     .stButton button {
         background: linear-gradient(90deg, #c2185b, #e91e63);
         color: white;
@@ -103,6 +71,7 @@ st.markdown("""
         box-shadow: 0 6px 14px rgba(233,30,99,0.4);
         cursor: pointer;
     }
+    
     .stFileUploader {
         border: 2px dashed #e91e63;
         border-radius: 24px;
@@ -113,12 +82,51 @@ st.markdown("""
         border-color: #c2185b;
         background-color: #fff0f3;
     }
-    h1, h2, h3, .stMarkdown, p, div, span, label {
-        font-family: 'Playfair Display', 'Times New Roman', 'Segoe UI', Arial, sans-serif;
+    
+    .app-header {
+        text-align: center;
+        padding: 25px 20px;
+        margin-bottom: 30px;
+        background: linear-gradient(135deg, #c2185b, #e91e63);
+        border-radius: 35px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
     }
+    .logo-text {
+        font-size: 2.8rem;
+        font-weight: 500;
+        font-style: italic;
+        letter-spacing: 1px;
+        margin-bottom: 5px;
+    }
+    .logo-ai {
+        font-size: 1.4rem;
+        font-weight: 600;
+        letter-spacing: 4px;
+    }
+    .logo-tagline {
+        font-size: 0.85rem;
+        margin-top: 10px;
+        letter-spacing: 1px;
+    }
+    
     .stSelectbox label, .stRadio label, .stColumns label {
         font-weight: 500;
         font-size: 1rem;
+    }
+    
+    div[data-testid="column"] {
+        background-color: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(2px);
+        border-radius: 20px;
+        padding: 15px;
+        margin: 8px;
+        transition: 0.3s;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    div[data-testid="column"]:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+        background-color: rgba(255, 255, 255, 0.95);
     }
 </style>
 
@@ -206,24 +214,11 @@ st.markdown("""
 
 st.subheader("📸 Tải ảnh lên để phân tích")
 
-# === CÁCH 1: CHỤP ẢNH TRỰC TIẾP (khuyến nghị cho mobile) ===
-st.markdown("**Cách 1: Chụp ảnh trực tiếp (nhanh, ổn định trên điện thoại)**")
-camera_image = st.camera_input("📷 Mở camera", key="camera_input")
+# Chỉ dùng upload ảnh, không dùng camera_input (tránh hao pin)
+uploaded_file = st.file_uploader("📁 Chọn ảnh từ thư viện", type=["jpg", "png", "jpeg"], key="file_uploader")
 
-# === CÁCH 2: UPLOAD ẢNH TỪ THƯ VIỆN ===
-st.markdown("**Cách 2: Chọn ảnh từ thư viện**")
-uploaded_file = st.file_uploader("📁 Tải ảnh lên", type=["jpg", "png", "jpeg"], key="file_uploader")
-
-# Xử lý ảnh từ nguồn nào có
-img = None
-if camera_image is not None:
-    img = Image.open(camera_image)
-    st.success("✅ Đã chụp ảnh thành công!")
-elif uploaded_file is not None:
+if uploaded_file is not None:
     img = Image.open(uploaded_file)
-    st.success("✅ Đã tải ảnh lên thành công!")
-
-if img:
     st.image(img, caption="Ảnh của bạn", width=250)
     r, g, b = get_dominant_color(img)
     st.success(f"🎨 Màu RGB: {r}, {g}, {b}")
@@ -278,6 +273,7 @@ Trả lời dưới dạng JSON:
                     st.error("Chuyên gia AI trả về định dạng không đúng.")
                     st.code(response_text[:1000])
                 else:
+                    st.markdown('<div class="ai-advice">', unsafe_allow_html=True)
                     st.subheader(f"💄 Tư vấn chuyên gia về {category}:")
                     
                     if "color_analysis" in data:
@@ -310,6 +306,7 @@ Trả lời dưới dạng JSON:
                                 st.markdown(f"[🛍️ Mua ngay]({link})", unsafe_allow_html=True)
                     else:
                         st.warning("Không có sản phẩm gợi ý.")
+                    st.markdown('</div>', unsafe_allow_html=True)
             except Exception as e:
                 st.error(f"Lỗi: {e}")
                 st.code(response_text[:1500])

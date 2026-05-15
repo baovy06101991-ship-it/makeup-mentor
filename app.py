@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image
 from groq import Groq
 import json
+import re
 
 st.set_page_config(page_title="Makeup Mentor AI", layout="wide")
 
@@ -33,29 +34,25 @@ def ask_groq(prompt):
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
-            temperature=0.7
+            temperature=0.9,
+            max_tokens=1500
         )
         return response.choices[0].message.content
     except Exception as e:
         return f"Lỗi: {e}"
 
-products = {
-    "Son": [
-        {"name": "MAC Chili", "brand": "MAC", "price": "750,000d", "link": "https://shopee.vn/search?keyword=MAC%20Chili"},
-        {"name": "Maybelline 130", "brand": "Maybelline", "price": "280,000d", "link": "https://shopee.vn/search?keyword=Maybelline%20130"},
-        {"name": "Romand Fudge", "brand": "Romand", "price": "320,000d", "link": "https://shopee.vn/search?keyword=Romand%20Fudge"}
-    ],
-    "Kem nen": [
-        {"name": "Fit Me 120", "brand": "Maybelline", "price": "280,000d", "link": "https://shopee.vn/search?keyword=Maybelline%20Fit%20Me%20120"},
-        {"name": "Infallible 130", "brand": "L'Oreal", "price": "380,000d", "link": "https://shopee.vn/search?keyword=L'Oreal%20Infallible%20130"}
-    ],
-    "Phan phu": [
-        {"name": "Innisfree No Sebum", "brand": "Innisfree", "price": "150,000d", "link": "https://shopee.vn/search?keyword=Innisfree%20No%20Sebum"}
-    ],
-    "Ma hong": [
-        {"name": "NARS Orgasm", "brand": "NARS", "price": "600,000d", "link": "https://shopee.vn/search?keyword=NARS%20Orgasm"}
-    ]
-}
+def extract_json_from_text(text):
+    json_match = re.search(r'```json\n(.*?)\n```', text, re.DOTALL)
+    if json_match:
+        return json.loads(json_match.group(1))
+    try:
+        return json.loads(text)
+    except:
+        return None
+
+def get_product_link(product_name, brand):
+    query = f"{brand} {product_name}".replace(" ", "%20")
+    return f"https://shopee.vn/search?keyword={query}"
 
 def get_dominant_color(image):
     img = image.resize((50, 50))
@@ -73,13 +70,10 @@ with col2:
 
 price_range = st.radio("💰 Phân khúc giá", ["Giá rẻ (dưới 500k)", "Tầm trung (500k - 1tr)", "Cao cấp (1tr - 2tr)"])
 price_prompt = {
-    "Giá rẻ (dưới 500k)": "ưu tiên sản phẩm dưới 500,000đ",
-    "Tầm trung (500k - 1tr)": "ưu tiên sản phẩm từ 500,000đ đến 1,000,000đ",
-    "Cao cấp (1tr - 2tr)": "ưu tiên sản phẩm từ 1,000,000đ đến 2,000,000đ"
+    "Giá rẻ (dưới 500k)": "dưới 500,000đ",
+    "Tầm trung (500k - 1tr)": "từ 500,000đ đến 1,000,000đ",
+    "Cao cấp (1tr - 2tr)": "từ 1,000,000đ đến 2,000,000đ"
 }[price_range]
-
-detail_level = st.radio("📝 Độ chi tiết", ["Nhanh (gợi ý chính)", "Chuyên sâu (có mã số, màu cụ thể)"])
-detail_prompt = "trả lời ngắn gọn" if "Nhanh" in detail_level else "trả lời chi tiết, có mã sản phẩm cụ thể (nếu biết), mô tả màu chính xác"
 
 st.markdown("---")
 st.subheader("📸 Tải ảnh màu son lên để phân tích")
@@ -93,35 +87,53 @@ if uploaded:
     st.success(f"🎨 Màu RGB: {r}, {g}, {b}")
 
     if st.button("🔍 Tư vấn AI"):
-        with st.spinner("AI đang phân tích..."):
+        with st.spinner("AI đang phân tích chi tiết..."):
             prompt = f"""
 Màu RGB ({r},{g},{b}) là màu son chính.
 Tình trạng môi: {lip_type}.
 Loại da: {skin_type}.
 Danh mục: {category}.
 Phân khúc giá: {price_prompt}.
-Yêu cầu chi tiết: {detail_prompt}.
 
-QUAN TRỌNG:
-- Phải viết đúng tên thương hiệu, đúng mã màu (ví dụ: INTOYOU 302, Romand 23, 3CE 212, MAC Chili, Maybelline 130...).
-- Không viết tắt hoặc sai chính tả tên hãng (INTOYOU, không phải INTYOU).
-- Mỗi gợi ý phải có: tên sản phẩm + thương hiệu + mã màu (nếu có) + giá + lý do phù hợp.
-
-Hãy tư vấn:
-1. Màu này gần với tông màu gì (đỏ cam, hồng đất, cam cháy, nâu hồng...)?
-2. Gợi ý 3 sản phẩm {category} cụ thể, **có mã màu hoặc tên màu chính xác**.
-3. Đánh giá độ phù hợp với loại da {skin_type} và tình trạng môi {lip_type}.
-4. Trả lời bằng tiếng Việt, dễ hiểu, chi tiết.
+QUAN TRỌNG: 
+- Hãy trả lời BẰNG TIẾNG VIỆT, DÀI, CHI TIẾT, ÍT NHẤT 200 TỪ.
+- Mô tả tông màu, cảm nhận, phong cách phù hợp.
+- Gợi ý 3 sản phẩm cụ thể (tên, thương hiệu, mã màu nếu có, giá, lý do).
+- Trả lời dưới dạng JSON thuần, không text thừa, theo cấu trúc:
+{{
+  "color_tone": "tông màu (ví dụ: đỏ cam, hồng đất, nâu hồng...)",
+  "advice": "lời khuyên chi tiết, dài, bao gồm cảm nhận và phong cách",
+  "products": [
+    {{"name": "tên sản phẩm", "brand": "thương hiệu", "code": "mã màu (nếu có)", "price": "giá VND", "reason": "lý do phù hợp"}},
+    {{...}},
+    {{...}}
+  ]
+}}
+- price chỉ ghi số, không kèm chữ (ví dụ: 350000).
+- Nếu không biết mã màu, để "không rõ".
 """
-            advice = ask_groq(prompt)
-            st.subheader("💄 Tư vấn AI:")
-            st.write(advice)
+            response_text = ask_groq(prompt)
+            try:
+                data = extract_json_from_text(response_text)
+                if not data:
+                    st.error("AI trả về định dạng không đúng, vui lòng thử lại.")
+                    st.code(response_text)
+                else:
+                    st.subheader("💄 Tư vấn AI:")
+                    st.write(f"**Tông màu:** {data.get('color_tone', 'không rõ')}")
+                    st.write(data.get('advice', ''))
 
-            st.subheader(f"🛒 Sản phẩm {category} tham khảo (theo phân khúc giá):")
-            products_list = products.get(category, [])
-            cols = st.columns(3)
-            for i, p in enumerate(products_list[:3]):
-                with cols[i % 3]:
-                    st.markdown(f"**{p['name']}**")
-                    st.markdown(f"🏷 {p['brand']} | 💰 {p['price']}")
-                    st.markdown(f"[🛍️ Mua ngay]({p['link']})", unsafe_allow_html=True)
+                    st.subheader("🛒 Sản phẩm gợi ý (kèm link mua):")
+                    cols = st.columns(3)
+                    for i, product in enumerate(data.get('products', [])[:3]):
+                        with cols[i % 3]:
+                            st.markdown(f"**{product.get('name', 'N/A')}**")
+                            st.markdown(f"🏷 {product.get('brand', 'N/A')} | 💰 {int(product.get('price', 0)):,}đ")
+                            if product.get('code') and product.get('code') != "không rõ":
+                                st.markdown(f"🔖 Mã màu: {product.get('code')}")
+                            st.markdown(f"📝 {product.get('reason', '')}")
+                            link = get_product_link(product.get('name', ''), product.get('brand', ''))
+                            st.markdown(f"[🛍️ Mua ngay trên Shopee]({link})", unsafe_allow_html=True)
+            except Exception as e:
+                st.error(f"Lỗi xử lý dữ liệu: {e}")
+                st.code(response_text)

@@ -5,9 +5,15 @@ from PIL import Image
 from groq import Groq
 import json
 import re
+import os
 
 # ==================== CẤU HÌNH TRANG ====================
 st.set_page_config(page_title="Makeup Mentor AI", layout="wide")
+
+# ==================== KHỞI TẠO SESSION STATE CHO LƯỢT TRUY CẬP ====================
+if "visit_count" not in st.session_state:
+    st.session_state.visit_count = 0
+st.session_state.visit_count += 1
 
 # ==================== CSS & HEADER ====================
 st.markdown("""
@@ -143,6 +149,23 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# ==================== SIDEBAR - THÔNG TIN & THỐNG KÊ ====================
+st.sidebar.markdown("### 📊 Thống kê")
+st.sidebar.metric("Lượt truy cập", st.session_state.visit_count)
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 👨‍💻 Tác giả")
+st.sidebar.markdown("**Nguyễn Thế Anh**")
+st.sidebar.markdown("📧 baovy06101991@gmail.com")
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 💡 Hướng dẫn")
+st.sidebar.markdown("""
+1. Chọn danh mục sản phẩm
+2. Chọn tình trạng môi, loại da
+3. Chọn phân khúc giá
+4. Tải ảnh lên (chụp cận vùng cần tư vấn)
+5. Bấm "Tư vấn chuyên gia"
+""")
+
 # ==================== KHỞI TẠO GROQ CLIENT ====================
 GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 client = Groq(api_key=GROQ_API_KEY)
@@ -208,7 +231,7 @@ st.markdown("---")
 # Hướng dẫn chụp ảnh
 st.markdown("""
 ### 📸 Hướng dẫn chụp ảnh để có kết quả chính xác nhất:
-| Bạn cần tư vấn sobre... | Hãy chụp cận... |
+| Bạn cần tư vấn về... | Hãy chụp cận... |
 |----------------------|------------------|
 | 🔴 **Màu son** | Vùng môi (tránh để mắt và da xung quanh) |
 | 🟠 **Màu mắt / phấn mắt** | Vùng mắt |
@@ -315,3 +338,12 @@ Trả lời dưới dạng JSON:
             except Exception as e:
                 st.error(f"Lỗi: {e}")
                 st.code(response_text[:1500])
+
+# ==================== FOOTER ====================
+st.markdown("---")
+st.markdown(
+    "<div style='text-align: center; color: gray; padding: 20px;'>"
+    "💄 Makeup Mentor AI | Tác giả: Nguyễn Thế Anh | 📧 baovy06101991@gmail.com"
+    "</div>",
+    unsafe_allow_html=True
+)

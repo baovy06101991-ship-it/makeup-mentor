@@ -41,27 +41,16 @@ def ask_groq(prompt):
     except Exception as e:
         return f"Lỗi: {e}"
 
-def clean_and_parse_json(text):
-    """Sửa lỗi JSON thường gặp và parse"""
-    # Loại bỏ markdown code blocks
+def extract_json_from_text(text):
     text = re.sub(r'```json\s*', '', text)
     text = re.sub(r'```\s*$', '', text)
-    
-    # Sửa lỗi missing closing brackets
     if text.count('{') > text.count('}'):
         text += '}' * (text.count('{') - text.count('}'))
     if text.count('[') > text.count(']'):
         text += ']' * (text.count('[') - text.count(']'))
-    
-    # Sửa lỗi sai key name (lip_care viết thành líp_care...)
-    text = text.replace('líp_care', 'lip_care')
-    text = text.replace('"líp_care"', '"lip_care"')
-    
-    # Thử parse
     try:
         return json.loads(text)
     except:
-        # Thử tìm JSON object bằng regex
         match = re.search(r'\{.*\}|\[.*\]', text, re.DOTALL)
         if match:
             try:
@@ -69,20 +58,6 @@ def clean_and_parse_json(text):
             except:
                 pass
         return None
-
-def extract_json_from_text(text):
-    """Trích xuất JSON từ văn bản với xử lý lỗi"""
-    # Ưu tiên dùng clean_and_parse_json
-    data = clean_and_parse_json(text)
-    if data:
-        return data
-    
-    # Fallback: tìm JSON block
-    json_match = re.search(r'```json\n(.*?)\n```', text, re.DOTALL)
-    if json_match:
-        return clean_and_parse_json(json_match.group(1))
-    
-    return None
 
 def get_product_link(product_name, brand):
     query = f"{brand} {product_name}".replace(" ", "%20")
@@ -94,7 +69,8 @@ def get_dominant_color(image):
     avg = arr.mean(axis=0).mean(axis=0).astype(int)
     return avg[0], avg[1], avg[2]
 
-category = st.selectbox("📂 Chọn danh mục sản phẩm", ["Son", "Kem nen", "Phan phu", "Ma hong"])
+# Danh mục sản phẩm (đã thêm Serum dưỡng da)
+category = st.selectbox("📂 Chọn danh mục sản phẩm", ["Son", "Kem nen", "Phan phu", "Ma hong", "Long may", "Phan mat", "Serum duong da"])
 
 col1, col2 = st.columns(2)
 with col1:
@@ -110,7 +86,7 @@ price_prompt = {
 }[price_range]
 
 st.markdown("---")
-st.subheader("📸 Tải ảnh màu son lên để phân tích")
+st.subheader("📸 Tải ảnh màu tham khảo lên để phân tích")
 
 uploaded = st.file_uploader("Chọn ảnh (jpg, png)", type=["jpg", "png", "jpeg"])
 
@@ -123,52 +99,53 @@ if uploaded:
     if st.button("🔍 Tư vấn chuyên gia"):
         with st.spinner("Chuyên gia AI đang phân tích..."):
             prompt = f"""
-BẠN LÀ CHUYÊN GIA TRANG ĐIỂM VỚI 10 NĂM KINH NGHIỆM.
-Hãy tư vấn một cách TẬN TÌNH, CHI TIẾT, dựa trên thông tin sau:
+BẠN LÀ CHUYÊN GIA TRANG ĐIỂM VÀ CHĂM SÓC DA VỚI 10 NĂM KINH NGHIỆM.
+QUAN TRỌNG: Người dùng đang cần tư vấn về DANH MỤC: {category}. 
+Hãy CHỈ tư vấn về {category}, KHÔNG tư vấn về sản phẩm khác.
 
-- Màu son RGB ({r},{g},{b})
-- Tình trạng môi: {lip_type}
+Thông tin:
+- Màu RGB ({r},{g},{b}) là màu {category} tham khảo
+- Tình trạng môi: {lip_type} (chỉ quan trọng nếu category là Son)
 - Loại da: {skin_type}
-- Danh mục: {category}
+- Danh mục cần tư vấn: {category}
 - Phân khúc giá: {price_prompt}
 
-YÊU CẦU TƯ VẤN CHUYÊN SÂU:
+YÊU CẦU TƯ VẤN CHUYÊN SÂU (CHỈ VỀ {category}):
 
-1. PHÂN TÍCH MÀU SẮC:
-   - Màu này thuộc tông nào?
-   - Cảm nhận: ấm áp/lạnh, dịu dàng/cá tính?
-   - Hợp với màu da nào?
-   - Phong cách phù hợp?
+1. PHÂN TÍCH MÀU SẮC (nếu cần):
+   - Nếu là Son: tông màu son, cảm nhận, phong cách
+   - Nếu là Kem nền: tông màu da, độ che phủ
+   - Nếu là Phấn phủ: màu nền, kiểm soát dầu
+   - Nếu là Má hồng: tông hồng, độ bắt sáng
+   - Nếu là Lông mày: màu chân mày, độ tự nhiên
+   - Nếu là Phấn mắt: tông màu mắt, độ bám màu
+   - Nếu là Serum dưỡng da: màu sắc không quan trọng, tập trung vào thành phần và công dụng
 
-2. TƯ VẤN SẢN PHẨM:
-   - Gợi ý 3 sản phẩm {category} (tên, thương hiệu, mã màu nếu có, giá, lý do).
+2. TƯ VẤN SẢN PHẨM {category}:
+   - Gợi ý 3 sản phẩm {category} cụ thể (tên, thương hiệu, mã màu nếu có, giá, lý do).
+   - Đối với Serum: lưu ý thành phần chính (Vitamin C, Retinol, HA, Niacinamide...), công dụng
 
-3. LỜI KHUYÊN:
-   - Dưỡng môi cho {lip_type}
-   - Chọn {category} cho da {skin_type}
-   - Kết hợp makeup
+3. LỜI KHUYÊN RIÊNG CHO {category}:
+   - Cách chọn {category} phù hợp với loại da {skin_type}
+   - Đối với Serum: hướng dẫn sử dụng (sáng/tối, quy trình skincare)
    - Lưu ý đặc biệt
 
 Trả lời dưới dạng JSON thuần, cấu trúc:
 {{
   "color_analysis": {{
-    "tone": "",
-    "feeling": "",
-    "skin_tone_suitable": "",
-    "style": ""
+    "tone": "tông màu (nếu có)",
+    "suitable_skin": "loại da phù hợp",
+    "style": "phong cách (nếu là makeup)"
   }},
   "products": [
-    {{"name": "", "brand": "", "code": "", "price": 0, "reason": ""}}
+    {{"name": "tên sản phẩm", "brand": "thương hiệu", "code": "mã màu (nếu có)", "price": 0, "reason": "lý do chi tiết"}}
   ],
   "advice": {{
-    "lip_care": "",
-    "skin_care": "",
-    "makeup_tips": "",
-    "note": ""
+    "selection_tips": "cách chọn cho da {skin_type}",
+    "usage": "cách sử dụng (quan trọng với Serum)",
+    "note": "lưu ý đặc biệt"
   }}
 }}
-- price chỉ ghi số.
-- Nếu không biết mã màu, để "không rõ".
 """
             response_text = ask_groq(prompt)
             try:
@@ -177,26 +154,27 @@ Trả lời dưới dạng JSON thuần, cấu trúc:
                     st.error("Chuyên gia AI trả về định dạng không đúng.")
                     st.code(response_text[:1000])
                 else:
-                    st.subheader("💄 Tư vấn chuyên gia:")
+                    st.subheader(f"💄 Tư vấn chuyên gia về {category}:")
                     
                     if "color_analysis" in data:
                         ca = data["color_analysis"]
-                        st.markdown(f"**🎨 Tông màu:** {ca.get('tone', 'không rõ')}")
-                        st.markdown(f"**💭 Cảm nhận:** {ca.get('feeling', 'không rõ')}")
-                        st.markdown(f"**👩 Màu da phù hợp:** {ca.get('skin_tone_suitable', 'không rõ')}")
-                        st.markdown(f"**✨ Phong cách:** {ca.get('style', 'không rõ')}")
+                        if ca.get('tone') and ca.get('tone') != "không rõ":
+                            st.markdown(f"**🎨 Tông màu:** {ca.get('tone')}")
+                        st.markdown(f"**👩 Loại da phù hợp:** {ca.get('suitable_skin', 'không rõ')}")
+                        if ca.get('style') and ca.get('style') != "không rõ":
+                            st.markdown(f"**✨ Phong cách:** {ca.get('style')}")
                     
                     if "advice" in data:
                         adv = data["advice"]
                         st.markdown("---")
                         st.markdown("### 📝 Lời khuyên chuyên sâu:")
-                        st.markdown(f"**💋 Dưỡng môi:** {adv.get('lip_care', 'không rõ')}")
-                        st.markdown(f"**🧴 Chọn son theo da:** {adv.get('skin_care', 'không rõ')}")
-                        st.markdown(f"**🎨 Kết hợp makeup:** {adv.get('makeup_tips', 'không rõ')}")
+                        st.markdown(f"**💡 Cách chọn:** {adv.get('selection_tips', 'không rõ')}")
+                        if adv.get('usage'):
+                            st.markdown(f"**🕒 Cách sử dụng:** {adv.get('usage')}")
                         st.markdown(f"**⚠️ Lưu ý:** {adv.get('note', 'không rõ')}")
                     
                     st.markdown("---")
-                    st.subheader("🛒 Sản phẩm gợi ý (kèm link mua):")
+                    st.subheader(f"🛒 Sản phẩm {category} gợi ý (kèm link mua):")
                     products_list = data.get('products', [])
                     if products_list:
                         cols = st.columns(3)

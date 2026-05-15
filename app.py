@@ -35,7 +35,7 @@ def ask_groq(prompt):
             model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.9,
-            max_tokens=1500
+            max_tokens=2500
         )
         return response.choices[0].message.content
     except Exception as e:
@@ -95,12 +95,19 @@ Loại da: {skin_type}.
 Danh mục: {category}.
 Phân khúc giá: {price_prompt}.
 
-QUAN TRỌNG: 
+YÊU CẦU QUAN TRỌNG:
+- TRẢ LỜI DÀI, CHI TIẾT, ÍT NHẤT 250 TỪ.
+- Mô tả CẢM NHẬN về màu sắc (ví dụ: ấm áp, dịu dàng, cá tính, sang trọng...).
+- Phân tích màu này hợp với phong cách nào (tự nhiên, công sở, dự tiệc, Hàn Quốc...).
 - Gợi ý 3 sản phẩm {category} cụ thể (tên, thương hiệu, mã màu nếu có, giá, lý do).
-- Trả lời dưới dạng JSON thuần, không text thừa, theo cấu trúc:
+- Nếu có thể, gợi ý thêm cách kết hợp với màu mắt, màu da.
+
+Trả lời dưới dạng JSON thuần, không text thừa, theo cấu trúc:
 {{
   "color_tone": "tông màu (ví dụ: đỏ cam, hồng đất, nâu hồng...)",
-  "advice": "lời khuyên chi tiết về sản phẩm và cách dùng",
+  "feeling": "cảm nhận về màu sắc (ấm áp, dịu dàng, cá tính...)",
+  "style": "phong cách phù hợp (tự nhiên, công sở, dự tiệc...)",
+  "advice": "lời khuyên chi tiết DÀI, bao gồm cách chọn son, dưỡng môi, kết hợp makeup",
   "products": [
     {{"name": "tên sản phẩm", "brand": "thương hiệu", "code": "mã màu (nếu có)", "price": 0, "reason": "lý do phù hợp"}},
     {{...}},
@@ -119,6 +126,8 @@ QUAN TRỌNG:
                 else:
                     st.subheader("💄 Tư vấn AI:")
                     st.write(f"**Tông màu:** {data.get('color_tone', 'không rõ')}")
+                    st.write(f"**Cảm nhận:** {data.get('feeling', 'không rõ')}")
+                    st.write(f"**Phong cách:** {data.get('style', 'không rõ')}")
                     st.write(data.get('advice', ''))
                     
                     st.subheader("🛒 Sản phẩm gợi ý:")
